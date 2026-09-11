@@ -15,7 +15,8 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "lint" : "npx prettier --write ."
   },
   "devDependencies": {
     "@types/node": "^25.9.2",
