@@ -30,13 +30,9 @@
     }
   },
 
-  "forwardPorts": [
-    3000,
-    8000,
-    8080
-  ],
+  "forwardPorts": [3000, 8000, 8080],
 
   "remoteUser": "vscode",
-  
+
   "postCreateCommand": "bash .devcontainer/setup.sh"
 }
