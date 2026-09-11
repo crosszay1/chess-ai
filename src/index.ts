@@ -19,7 +19,7 @@ class Algorithm {
         const move = moves[Math.floor(Math.random() * moves.length)] // decide move randomly
         chess.move(move) // make the move
     }
-    private getWinningSide(chess: Chess, pieceValues: Record<PieceSymbol, number>): number {
+    public getWinningSide(chess: Chess, pieceValues: Record<PieceSymbol, number>): number {
         let white = 0
         let black = 0
           for (const row of chess.board()) {
@@ -43,6 +43,7 @@ const algorithm = new Algorithm
 
 while (!chess.isGameOver()) {
     algorithm.decideMove(chess)
+    console.log(`Current score: ${algorithm.getWinningSide(chess, pieceValues)}`)
 }
 
 console.log(chess.pgn())
