@@ -20,7 +20,7 @@ class Algorithm {
         for (const move of moves) {
             chess.move(move)
             const maxOrMini = chess.turn() === 'w' // true if white turn, false if black turn
-            const currentScore = this.miniMax(chess, 3, maxOrMini) //depth 3, pass in the turn boolean
+            const currentScore = this.miniMax(chess, 3, maxOrMini, -Infinity, Infinity) // chess object, depth=3, whether we are max or mini, alpha = -infinity (worst value or white), beta = Infinity (worst value for black)
             chess.undo()
             
 
@@ -53,7 +53,7 @@ class Algorithm {
         }
         return white-black // Negative, means black is winning, positive means white is winning, and the absolute value is by how much
     }
-    private miniMax(chess: Chess, depth: number, isMax: boolean): number {
+    private miniMax(chess: Chess, depth: number, isMax: boolean, alpha: number, beta: number): number {
         if (depth == 0 || chess.isGameOver()) {
             if (chess.isCheckmate()) {
                 return chess.turn() === 'w' ? -Infinity : Infinity
@@ -70,10 +70,14 @@ class Algorithm {
             let bestScore = -Infinity
             for (const move of moves) {
                 chess.move(move) // Make the move
-                const currentScore = this.miniMax(chess, depth - 1, false); // Call back into minimax function to continue down the tree. Input depth -1 so eventually we'll reach a state in which depth == 0 (end)
+                const currentScore = this.miniMax(chess, depth - 1, false, alpha, beta); // Call back into minimax function to continue down the tree. Input depth -1 so eventually we'll reach a state in which depth == 0 (end)
                 chess.undo() // Undo move
 
                 bestScore = Math.max(bestScore, currentScore)
+                alpha = Math.max(alpha, currentScore)
+                if (beta <= alpha) {
+                    break
+                }
             }
             return bestScore
         }
@@ -82,10 +86,14 @@ class Algorithm {
             let bestScore = Infinity
             for (const move of moves) {
                 chess.move(move) // Make the move
-                const currentScore = this.miniMax(chess, depth - 1, true); // Call back into minimax function to continue down the tree. Input depth -1 so eventually we'll reach a state in which depth == 0 (end)
+                const currentScore = this.miniMax(chess, depth - 1, true, alpha, beta); // Call back into minimax function to continue down the tree. Input depth -1 so eventually we'll reach a state in which depth == 0 (end)
                 chess.undo()
 
                 bestScore = Math.min(bestScore, currentScore) // This is the difference between: best = minimum, or best = maximum
+                beta = Math.min(beta, currentScore)
+                if (beta <= alpha) {
+                    break
+                }
             }
             return bestScore
         }
@@ -100,6 +108,7 @@ const algorithm = new Algorithm()
 while (!chess.isGameOver()) {
     algorithm.decideMove(chess)
     console.log(`Current score: ${algorithm.getWinningSide(chess, pieceValues)}`)
+    console.log(`Moves so far: ${chess.pgn()}`)
 }
 
 console.log(chess.pgn())
