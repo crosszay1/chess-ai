@@ -1,4 +1,5 @@
 import { BISHOP, Chess, KING, KNIGHT, PAWN, PieceSymbol, QUEEN, ROOK } from 'chess.js'
+import { inflate } from 'node:zlib'
 
 const pieceValues: Record<PieceSymbol, number> = {
     [PAWN]: 1,
@@ -13,17 +14,20 @@ class Algorithm {
     public decideMove(chess: Chess) {
         const moves = chess.moves()
         let bestMove = moves[0]
-        let bestScore = -Infinity
+        const isWhite = chess.turn() === 'w'
+        let bestScore = isWhite ? Infinity : -Infinity
 
         for (const move of moves) {
             chess.move(move)
-            const currentScore = this.miniMax(chess, 1, false) //depth 1, 
+            const maxOrMini = chess.turn() === 'w' // true if white turn, false if black turn
+            const currentScore = this.miniMax(chess, 1, maxOrMini) //depth 1, pass in the turn boolean
             chess.undo()
+            
 
-            if (chess.turn() == `w` && currentScore > bestScore) { // White's turn
+            if (isWhite && currentScore > bestScore) { // White's turn
                 bestScore = currentScore
                 bestMove = move
-            } else if (chess.turn() == `b` && currentScore < bestScore) { // Black's turn
+            } else if (!isWhite && currentScore < bestScore) { // Black's turn
                 bestScore = currentScore
                 bestMove = move
             }
