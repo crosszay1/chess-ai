@@ -20,7 +20,7 @@ class Algorithm {
         for (const move of moves) {
             chess.move(move)
             const maxOrMini = chess.turn() === 'w' // true if white turn, false if black turn
-            const currentScore = this.miniMax(chess, 1, maxOrMini) //depth 1, pass in the turn boolean
+            const currentScore = this.miniMax(chess, 3, maxOrMini) //depth 3, pass in the turn boolean
             chess.undo()
             
 
