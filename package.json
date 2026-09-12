@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@chrisoakman/chessboardjs": "^1.0.0",
-    "chess.js": "^1.4.0"
+    "chess.js": "^1.4.0",
+    "react-chessboard": "^5.12.1"
   }
 }

@@ -33,9 +33,7 @@ class Algorithm {
             }
         }
 
-        if (bestMove) {
-            chess.move(bestMove) // Actually make the move
-        }
+        return bestMove
     }
     public getWinningSide(chess: Chess, pieceValues: Record<PieceSymbol, number>): number {
         let white = 0
@@ -106,7 +104,10 @@ const algorithm = new Algorithm()
 
 
 while (!chess.isGameOver()) {
-    algorithm.decideMove(chess)
+    const move = algorithm.decideMove(chess)
+    if (move) {
+        chess.move(move)
+    }
     console.log(`Current score: ${algorithm.getWinningSide(chess, pieceValues)}`)
     console.log(`Moves so far: ${chess.pgn()}`)
 }
