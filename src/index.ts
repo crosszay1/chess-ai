@@ -11,8 +11,27 @@ const pieceValues: Record<PieceSymbol, number> = {
 
 class Algorithm {
     public decideMove(chess: Chess) {
-        const move = this.miniMax(chess, 1, true)
-        chess.move(move) // make the move
+        const moves = chess.moves()
+        let bestMove = moves[0]
+        let bestScore = -Infinity
+
+        for (const move of moves) {
+            chess.move(move)
+            const currentScore = this.miniMax(chess, 1, false) //depth 1, 
+            chess.undo()
+
+            if (chess.turn() == `w` && currentScore > bestScore) { // White's turn
+                bestScore = currentScore
+                bestMove = move
+            } else if (chess.turn() == `b` && currentScore < bestScore) { // Black's turn
+                bestScore = currentScore
+                bestMove = move
+            }
+        }
+
+        if (bestMove) {
+            chess.move(bestMove) // Actually make the move
+        }
     }
     public getWinningSide(chess: Chess, pieceValues: Record<PieceSymbol, number>): number {
         let white = 0
@@ -53,7 +72,7 @@ class Algorithm {
             let bestScore = Infinity
             for (const move of moves) {
                 chess.move(move) // Make the move
-                const currentScore = this.miniMax(chess, depth - 1, false); // Call back into minimax function to continue down the tree. Input depth -1 so eventually we'll reach a state in which depth == 0 (end)
+                const currentScore = this.miniMax(chess, depth - 1, true); // Call back into minimax function to continue down the tree. Input depth -1 so eventually we'll reach a state in which depth == 0 (end)
                 chess.undo()
 
                 bestScore = Math.min(bestScore, currentScore) // This is the difference between: best = minimum, or best = maximum
