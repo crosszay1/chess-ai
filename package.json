@@ -16,6 +16,7 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "ui": "vite",
+    "pva": "vite --mode pva",
     "build": "tsc",
     "build:ui": "vite build",
     "lint": "npx prettier --write ."

@@ -4,7 +4,8 @@ import { Chessboard } from 'react-chessboard'
 import { Algorithm, pieceValues } from '../algorithm'
 
 const MOVE_DELAY_MS = 500
-const SEARCH_DEPTH = 4
+const SEARCH_DEPTH = 3
+const PLAYER_VS_ALGORITHM = import.meta.env.MODE === 'pva'
 
 function gameStatus(chess: Chess): string {
   if (chess.isCheckmate()) {
@@ -29,6 +30,7 @@ export default function App() {
 
   useEffect(() => {
     if (!playing) return
+    if (PLAYER_VS_ALGORITHM && gameRef.current.turn() === 'w') return
     if (gameRef.current.isGameOver()) {
       setPlaying(false)
       return
@@ -63,11 +65,28 @@ export default function App() {
     setPlaying(true)
   }
 
+  function handlePieceDrop({ sourceSquare, targetSquare }: { sourceSquare: string; targetSquare: string }) {
+    if (!PLAYER_VS_ALGORITHM || game.turn() !== 'w' || game.isGameOver()) return false
+
+    try {
+      game.move({ from: sourceSquare, to: targetSquare, promotion: 'q' })
+    } catch {
+      return false
+    }
+
+    setFen(game.fen())
+    setMoveCount(game.history().length)
+    if (game.isGameOver()) {
+      setPlaying(false)
+    }
+    return true
+  }
+
   return (
     <div className="app">
       <header className="header">
         <h1>Chess AI</h1>
-        <p>Watch the minimax engine play itself</p>
+        <p>{PLAYER_VS_ALGORITHM ? 'Play against the minimax engine' : 'Watch the minimax engine play itself'}</p>
       </header>
 
       <main className="main">
@@ -76,7 +95,8 @@ export default function App() {
             options={{
               id: 'ai-board',
               position: fen,
-              allowDragging: false,
+              allowDragging: PLAYER_VS_ALGORITHM && game.turn() === 'w' && !game.isGameOver(),
+              onPieceDrop: handlePieceDrop,
               showAnimations: true,
               animationDurationInMs: 250,
               boardStyle: {
