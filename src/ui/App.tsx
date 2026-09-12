@@ -4,7 +4,7 @@ import { Chessboard } from 'react-chessboard'
 import { Algorithm, pieceValues } from '../algorithm'
 
 const MOVE_DELAY_MS = 500
-const SEARCH_DEPTH = 2
+const SEARCH_DEPTH = 4
 
 function gameStatus(chess: Chess): string {
   if (chess.isCheckmate()) {
