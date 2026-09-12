@@ -1,4 +1,4 @@
-import { BISHOP, Chess, Color, KING, KNIGHT, PAWN, PieceSymbol, QUEEN, ROOK } from 'chess.js'
+import { BISHOP, Chess, KING, KNIGHT, PAWN, PieceSymbol, QUEEN, ROOK } from 'chess.js'
 
 
 // Just plays a random game of chess
@@ -34,15 +34,19 @@ class Algorithm {
         }
         return white-black // Negative, means black is winning, positive means white is winning, and the absolute value is by how much
     }
-    private miniMax(chess: Chess, depth: Number, isMax: boolean) {
+    private miniMax(chess: Chess, depth: number, isMax: boolean): string {
         // STUB
+        if (depth == 0 || chess.isGameOver()) {
+            return String(this.getWinningSide(chess, pieceValues))
+        }
+
         const moves = chess.moves() // Get moves
         const move = moves[Math.floor(Math.random() * moves.length)] // decide move randomly
         return move
     }
 }
 const chess = new Chess()
-const algorithm = new Algorithm
+const algorithm = new Algorithm()
 
 
 
