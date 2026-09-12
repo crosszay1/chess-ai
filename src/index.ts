@@ -1,9 +1,5 @@
 import { BISHOP, Chess, KING, KNIGHT, PAWN, PieceSymbol, QUEEN, ROOK } from 'chess.js'
 
-
-// Just plays a random game of chess
-// based on https://github.com/jhlywa/chess.js example code
-
 const pieceValues: Record<PieceSymbol, number> = {
     [PAWN]: 1,
     [BISHOP]: 3,
@@ -39,9 +35,10 @@ class Algorithm {
             return this.getWinningSide(chess, pieceValues)
         }
         const moves = chess.moves()
-        let bestScore = -Infinity
+        
 
         if (isMax) { // If we are playing at the max player
+            let bestScore = -Infinity
             for (const move of moves) {
                 chess.move(move) // Make the move
                 const currentScore = this.miniMax(chess, depth - 1, false); // Call back into minimax function to continue down the tree. Input depth -1 so eventually we'll reach a state in which depth == 0 (end)
@@ -49,9 +46,21 @@ class Algorithm {
 
                 bestScore = Math.max(bestScore, currentScore)
             }
+            return bestScore
+        }
+        else {
+            // Pretty much just opposite what we did before
+            let bestScore = Infinity
+            for (const move of moves) {
+                chess.move(move) // Make the move
+                const currentScore = this.miniMax(chess, depth - 1, false); // Call back into minimax function to continue down the tree. Input depth -1 so eventually we'll reach a state in which depth == 0 (end)
+                chess.undo()
+
+                bestScore = Math.min(bestScore, currentScore) // This is the difference between: best = minimum, or best = maximum
+            }
+            return bestScore
         }
         
-        return bestScore
     }
 }
 const chess = new Chess()
