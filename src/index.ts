@@ -55,6 +55,9 @@ class Algorithm {
     }
     private miniMax(chess: Chess, depth: number, isMax: boolean): number {
         if (depth == 0 || chess.isGameOver()) {
+            if (chess.isDraw()) {
+                return 0
+            }
             return this.getWinningSide(chess, pieceValues)
         }
         const moves = chess.moves()
