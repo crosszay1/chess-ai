@@ -34,15 +34,24 @@ class Algorithm {
         }
         return white-black // Negative, means black is winning, positive means white is winning, and the absolute value is by how much
     }
-    private miniMax(chess: Chess, depth: number, isMax: boolean): string {
-        // STUB
+    private miniMax(chess: Chess, depth: number, isMax: boolean): number {
         if (depth == 0 || chess.isGameOver()) {
-            return String(this.getWinningSide(chess, pieceValues))
+            return this.getWinningSide(chess, pieceValues)
         }
+        const moves = chess.moves()
+        let bestScore = -Infinity
 
-        const moves = chess.moves() // Get moves
-        const move = moves[Math.floor(Math.random() * moves.length)] // decide move randomly
-        return move
+        if (isMax) { // If we are playing at the max player
+            for (const move of moves) {
+                chess.move(move) // Make the move
+                const currentScore = this.miniMax(chess, depth - 1, false); // Call back into minimax function to continue down the tree. Input depth -1 so eventually we'll reach a state in which depth == 0 (end)
+                chess.undo() // Undo move
+
+                bestScore = Math.max(bestScore, currentScore)
+            }
+        }
+        
+        return bestScore
     }
 }
 const chess = new Chess()
