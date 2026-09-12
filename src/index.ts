@@ -15,7 +15,7 @@ class Algorithm {
         const moves = chess.moves()
         let bestMove = moves[0]
         const isWhite = chess.turn() === 'w'
-        let bestScore = isWhite ? Infinity : -Infinity
+        let bestScore = isWhite ? -Infinity : Infinity
 
         for (const move of moves) {
             chess.move(move)
