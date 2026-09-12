@@ -10,13 +10,12 @@ const pieceValues: Record<PieceSymbol, number> = {
     [KNIGHT]: 3,
     [ROOK]: 5,
     [QUEEN]: 9,
-    [KING]: 0,
+    [KING]: 9999, // Set this super high so minimax really prefers it
 }
 
 class Algorithm {
     public decideMove(chess: Chess) {
-        const moves = chess.moves() // Get moves
-        const move = moves[Math.floor(Math.random() * moves.length)] // decide move randomly
+        const move = this.miniMax(chess, 1, true)
         chess.move(move) // make the move
     }
     public getWinningSide(chess: Chess, pieceValues: Record<PieceSymbol, number>): number {
@@ -34,6 +33,12 @@ class Algorithm {
             }
         }
         return white-black // Negative, means black is winning, positive means white is winning, and the absolute value is by how much
+    }
+    private miniMax(chess: Chess, depth: Number, isMax: boolean) {
+        // STUB
+        const moves = chess.moves() // Get moves
+        const move = moves[Math.floor(Math.random() * moves.length)] // decide move randomly
+        return move
     }
 }
 const chess = new Chess()
