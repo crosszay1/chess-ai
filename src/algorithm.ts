@@ -35,8 +35,10 @@ export class Algorithm {
 
     return bestMove
   }
-
-  public getWinningSide(chess: Chess, values: Record<PieceSymbol, number> = pieceValues): number {
+  public evaluateBoard(chess: Chess, values: Record<PieceSymbol, number> = pieceValues): number {
+    return this.getMaterialScore(chess, values)
+  }
+  private getMaterialScore(chess: Chess, values: Record<PieceSymbol, number> = pieceValues): number {
     let white = 0
     let black = 0
     for (const row of chess.board()) {

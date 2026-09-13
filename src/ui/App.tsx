@@ -54,7 +54,7 @@ export default function App() {
     return () => window.clearTimeout(timer)
   }, [playing, fen])
 
-  const score = algorithmRef.current.getWinningSide(game, pieceValues)
+  const score = algorithmRef.current.evaluateBoard(game, pieceValues)
   const scoreLabel =
     score > 0 ? `White +${score}` : score < 0 ? `Black +${Math.abs(score)}` : 'Even'
 
