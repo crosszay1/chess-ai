@@ -69,9 +69,9 @@ export class Algorithm {
     return whiteMoves - blackMoves // If positve, white is winning, if negative, black is winning
 }
   private orderMoves(chess: Chess, moves: Move[]): Move[] {
-    return moves.sort((a, b) => this.moveScore(b) - this.moveScore(a))
+    return moves.sort((a, b) => this.scoreMoves(b) - this.scoreMoves(a))
   }
-  private moveScore(move: Move): number {
+  private scoreMoves(move: Move): number {
     let score = 0
     if (move.captured) score += 10 * pieceValues[move.captured] - pieceValues[move.piece] // MVV-LVA
     if (move.promotion) score += pieceValues[move.promotion]
