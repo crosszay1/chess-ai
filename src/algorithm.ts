@@ -1,4 +1,4 @@
-import { BISHOP, Chess, KING, KNIGHT, PAWN, PieceSymbol, QUEEN, ROOK } from 'chess.js'
+import { BISHOP, Chess, KING, KNIGHT, Move, PAWN, PieceSymbol, QUEEN, ROOK } from 'chess.js'
 
 export const pieceValues: Record<PieceSymbol, number> = {
   [PAWN]: 1,
@@ -11,7 +11,7 @@ export const pieceValues: Record<PieceSymbol, number> = {
 
 export class Algorithm {
   public decideMove(chess: Chess, depth = 3) {
-    const moves = chess.moves()
+    const moves = this.orderMoves(chess, chess.moves({ verbose: true }))
     let bestMove = moves[0]
     const isWhite = chess.turn() === 'w'
     let bestScore = isWhite ? -Infinity : Infinity
@@ -53,6 +53,16 @@ export class Algorithm {
     // Negative means black is winning, positive means white is winning
     return white - black
   }
+  private orderMoves(chess: Chess, moves: Move[]): Move[] {
+    return moves.sort((a, b) => this.moveScore(b) - this.moveScore(a))
+  }
+  private moveScore(move: Move): number {
+    let score = 0
+    if (move.captured) score += 10 * pieceValues[move.captured] - pieceValues[move.piece] // MVV-LVA
+    if (move.promotion) score += pieceValues[move.promotion]
+    if (move.san.includes('+')) score += 5
+    return score
+}
 
   private miniMax(chess: Chess, depth: number, isMax: boolean, alpha: number, beta: number): number {
     if (depth == 0 || chess.isGameOver()) {
