@@ -9,6 +9,12 @@ export const pieceValues: Record<PieceSymbol, number> = {
   [KING]: 9999, // Set this super high so minimax really prefers it
 }
 
+const scoringWeights = {
+  material: 1,
+  mobility: 1,
+  kingSafety: 0.5,
+}
+
 export class Algorithm {
   public decideMove(chess: Chess, depth = 3) {
     const moves = this.orderMoves(chess, chess.moves({ verbose: true }))
@@ -46,7 +52,14 @@ export class Algorithm {
 
     const kingSafetyScore = whiteKingSafetyScore - blackKingSafetyScore
 
-    return materialScore + mobilityScore + kingSafetyScore
+    return this.getWeightedScore(materialScore, mobilityScore, kingSafetyScore, scoringWeights)
+  }
+  private getWeightedScore(materialScore: number, mobilityScore: number, kingSafetyScore: number, weights: typeof scoringWeights): number {
+    return (
+      materialScore * weights.material +
+      mobilityScore * weights.mobility +
+      kingSafetyScore * weights.kingSafety
+    )
   }
   private getMaterialScore(chess: Chess, values: Record<PieceSymbol, number> = pieceValues): number {
     let white = 0
