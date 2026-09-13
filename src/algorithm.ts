@@ -38,7 +38,7 @@ export class Algorithm {
   public evaluateBoard(chess: Chess, values: Record<PieceSymbol, number> = pieceValues): number {
     const materialScore = this.getMaterialScore(chess, values)
     const mobilityScore = this.mobilityScore(chess)
-    
+
     return materialScore + mobilityScore
   }
   private getMaterialScore(chess: Chess, values: Record<PieceSymbol, number> = pieceValues): number {
@@ -60,11 +60,11 @@ export class Algorithm {
   }
   private mobilityScore(chess: Chess): number {
     const turn = chess.turn()
-    chess.setTurn("w") // set to white to get white moves
-    const whiteMoves = chess.moves().length
-    chess.setTurn("b") // set to black to get black moves
-    const blackMoves = chess.moves().length
-    chess.setTurn(turn) // set back to original turn
+    const newChess = new Chess(chess.fen()) // Create a new chess instance to mutating the original chess instance. If we set the turn many times, this triggers an incorrect threefold repetition detection and the game will be considered a draw. 
+    const whiteMoves = newChess.moves().length
+    newChess.setTurn("b") // set to black to get black moves
+    const blackMoves = newChess.moves().length
+    newChess.setTurn(turn) // set back to original turn
 
     return whiteMoves - blackMoves // If positve, white is winning, if negative, black is winning
 }
