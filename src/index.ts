@@ -9,7 +9,7 @@ while (!chess.isGameOver()) {
   if (move) {
     chess.move(move)
   }
-  console.log(`Current score: ${algorithm.getWinningSide(chess, pieceValues)}`)
+  console.log(`Current score: ${algorithm.evaluateBoard(chess, pieceValues)}`)
   console.log(`Moves so far: ${chess.pgn()}`)
 }
 
