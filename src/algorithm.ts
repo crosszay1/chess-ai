@@ -36,7 +36,10 @@ export class Algorithm {
     return bestMove
   }
   public evaluateBoard(chess: Chess, values: Record<PieceSymbol, number> = pieceValues): number {
-    return this.getMaterialScore(chess, values)
+    const materialScore = this.getMaterialScore(chess, values)
+    const mobilityScore = this.mobilityScore(chess)
+    
+    return materialScore + mobilityScore
   }
   private getMaterialScore(chess: Chess, values: Record<PieceSymbol, number> = pieceValues): number {
     let white = 0
@@ -55,6 +58,16 @@ export class Algorithm {
     // Negative means black is winning, positive means white is winning
     return white - black
   }
+  private mobilityScore(chess: Chess): number {
+    const turn = chess.turn()
+    chess.setTurn("w") // set to white to get white moves
+    const whiteMoves = chess.moves().length
+    chess.setTurn("b") // set to black to get black moves
+    const blackMoves = chess.moves().length
+    chess.setTurn(turn) // set back to original turn
+
+    return whiteMoves - blackMoves // If positve, white is winning, if negative, black is winning
+}
   private orderMoves(chess: Chess, moves: Move[]): Move[] {
     return moves.sort((a, b) => this.moveScore(b) - this.moveScore(a))
   }
@@ -74,7 +87,7 @@ export class Algorithm {
       if (chess.isDraw()) {
         return 0
       }
-      return this.getWinningSide(chess, pieceValues)
+      return this.evaluateBoard(chess, pieceValues)
     }
     const moves = chess.moves()
 
