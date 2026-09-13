@@ -89,7 +89,7 @@ export class Algorithm {
       }
       return this.evaluateBoard(chess, pieceValues)
     }
-    const moves = chess.moves()
+    const moves = chess.moves({ verbose: true })
 
     if (isMax) {
       // If we are playing at the max player
