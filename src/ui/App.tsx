@@ -113,7 +113,7 @@ export default function App() {
             <span className="value">{gameStatus(game)}</span>
           </div>
           <div className="stat">
-            <span className="label">Material</span>
+            <span className="label">Score</span>
             <span className="value">{scoreLabel}</span>
           </div>
           <div className="stat">
