@@ -12,7 +12,7 @@ export const pieceValues: Record<PieceSymbol, number> = {
 const scoringWeights = {
   material: 1,
   mobility: 1,
-  kingSafety: 0.5,
+  kingSafety: 0.5, // Set this lower because otherwise the algorithm cares too much, and doesn't develop it's pieces
 }
 
 export class Algorithm {
