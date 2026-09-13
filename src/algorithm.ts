@@ -12,7 +12,7 @@ export const pieceValues: Record<PieceSymbol, number> = {
 const scoringWeights = {
   material: 1,
   mobility: 1,
-  kingSafety: 0.5, // Set this lower because otherwise the algorithm cares too much, and doesn't develop it's pieces
+  kingSafety: 1, // Set this lower because otherwise the algorithm cares too much, and doesn't develop it's pieces
 }
 
 export class Algorithm {
@@ -118,24 +118,24 @@ export class Algorithm {
 
         // Nearby friendly piece bonus
         if (piece?.color === color) {
-          score += 5
+          score += 1
         }
 
         // Enemy piece physically near the king
         if (piece?.color === enemy) {
-          score -= pieceValues[piece.type] // Value of that piece as a penalty (as a nearby queen is more threatening than a nearby pawn)
+          score -= pieceValues[piece.type] / 3 // Value of that piece as a penalty (as a nearby queen is more threatening than a nearby pawn). Divide by 3 to make it less important. 
         }
 
         // Enemy attacks square near king
         if (chess.isAttacked(nearbySquare, enemy)) {
-          score -= 10
+          score -= 1
         }
       }
     }
 
     // King checked = really bad, really big penalty
     if (chess.isAttacked(square, enemy)) {
-      score -= 50
+      score -= 10
     }
 
     return score
