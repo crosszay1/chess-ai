@@ -1,4 +1,4 @@
-import { BISHOP, Chess, KING, KNIGHT, Move, PAWN, PieceSymbol, QUEEN, ROOK } from 'chess.js'
+import { BISHOP, BLACK, Chess, KING, KNIGHT, Move, PAWN, PieceSymbol, QUEEN, ROOK, Square, WHITE } from 'chess.js'
 
 export const pieceValues: Record<PieceSymbol, number> = {
   [PAWN]: 1,
@@ -39,7 +39,14 @@ export class Algorithm {
     const materialScore = this.getMaterialScore(chess, values)
     const mobilityScore = this.mobilityScore(chess)
 
-    return materialScore + mobilityScore
+    const whiteKingSquare = chess.findPiece({ type: KING, color: WHITE }); 
+    const blackKingSquare = chess.findPiece({ type: KING, color: BLACK }); 
+    const blackKingSafetyScore = this.kingSafetyScore(chess, 'b', blackKingSquare)
+    const whiteKingSafetyScore = this.kingSafetyScore(chess, 'w', whiteKingSquare)
+
+    const kingSafetyScore = whiteKingSafetyScore - blackKingSafetyScore
+
+    return materialScore + mobilityScore + kingSafetyScore
   }
   private getMaterialScore(chess: Chess, values: Record<PieceSymbol, number> = pieceValues): number {
     let white = 0
@@ -67,7 +74,59 @@ export class Algorithm {
     newChess.setTurn(turn) // set back to original turn
 
     return whiteMoves - blackMoves // If positve, white is winning, if negative, black is winning
-}
+  }
+  private kingSafetyScore(chess: Chess, color: 'w' | 'b', kingSquare: Square[]): number {
+    const square = kingSquare[0]
+    if (!square) return 0
+
+    const enemy = color === 'w' ? 'b' : 'w'
+    let score = 0
+
+    const file = square.charCodeAt(0) - 'a'.charCodeAt(0)
+    const rank = Number(square[1]) - 1
+
+    // Look at the 8 squares surrounding king
+    for (let df = -1; df <= 1; df++) {
+      for (let dr = -1; dr <= 1; dr++) {
+        // Skip the king's own square
+        if (df === 0 && dr === 0) continue
+
+        const newFile = file + df
+        const newRank = rank + dr
+
+        // Off the board
+        if (newFile < 0 || newFile > 7 || newRank < 0 || newRank > 7) {
+          continue
+        }
+
+        const nearbySquare = (String.fromCharCode('a'.charCodeAt(0) + newFile) + (newRank + 1)) as Square
+
+        const piece = chess.get(nearbySquare)
+
+        // Nearby friendly piece bonus
+        if (piece?.color === color) {
+          score += 5
+        }
+
+        // Enemy piece physically near the king
+        if (piece?.color === enemy) {
+          score -= pieceValues[piece.type] // Value of that piece as a penalty (as a nearby queen is more threatening than a nearby pawn)
+        }
+
+        // Enemy attacks square near king
+        if (chess.isAttacked(nearbySquare, enemy)) {
+          score -= 10
+        }
+      }
+    }
+
+    // King checked = really bad, really big penalty
+    if (chess.isAttacked(square, enemy)) {
+      score -= 50
+    }
+
+    return score
+  }
   private orderMoves(chess: Chess, moves: Move[]): Move[] {
     return moves.sort((a, b) => this.scoreMoves(b) - this.scoreMoves(a))
   }
