@@ -11,7 +11,7 @@ export const pieceValues: Record<PieceSymbol, number> = {
 
 const scoringWeights = {
   material: 1,
-  mobility: 1,
+  mobility: 0.5,
   kingSafety: 1, // Set this lower because otherwise the algorithm cares too much, and doesn't develop it's pieces
 }
 
@@ -78,15 +78,23 @@ export class Algorithm {
     // Negative means black is winning, positive means white is winning
     return white - black
   }
-  private mobilityScore(chess: Chess): number {
-    const turn = chess.turn()
-    const newChess = new Chess(chess.fen()) // Create a new chess instance to mutating the original chess instance. If we set the turn many times, this triggers an incorrect threefold repetition detection and the game will be considered a draw. 
-    const whiteMoves = newChess.moves().length
-    newChess.setTurn("b") // set to black to get black moves
-    const blackMoves = newChess.moves().length
-    newChess.setTurn(turn) // set back to original turn
+  private mobilityScore(chess: Chess): number { // Overcomplicated much?
+    // Get the number of moves for the player whose turn it currently is
+    const sideToMoveMoves = chess.moves().length
 
-    return whiteMoves - blackMoves // If positve, white is winning, if negative, black is winning
+    // Break down the current FEN string
+    const [placement, active, castling, ep, half, full] = chess.fen().split(' ')
+    
+    // Reverse the FEN string
+    const flippedFen = [placement, active === 'w' ? 'b' : 'w', castling, ep, half, full].join(' ')
+    
+    // Use that FEN string to make a new chess instance and get the number of moves for the other player
+    const otherSideMoves = new Chess(flippedFen, { skipValidation: true }).moves().length
+    
+    //  Always return the score from White's perspective (White - Black)
+    return chess.turn() === 'w'
+      ? sideToMoveMoves - otherSideMoves
+      : otherSideMoves - sideToMoveMoves
   }
   private kingSafetyScore(chess: Chess, color: 'w' | 'b', kingSquare: Square[]): number {
     const square = kingSquare[0]
