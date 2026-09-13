@@ -13,6 +13,7 @@ const scoringWeights = {
   material: 1,
   mobility: 0.5,
   kingSafety: 1, // Set this lower because otherwise the algorithm cares too much, and doesn't develop it's pieces
+  pawnStructure: 1
 }
 
 export class Algorithm {
@@ -52,13 +53,16 @@ export class Algorithm {
 
     const kingSafetyScore = whiteKingSafetyScore - blackKingSafetyScore
 
-    return this.getWeightedScore(materialScore, mobilityScore, kingSafetyScore, scoringWeights)
+    const pawnStructureScore = this.pawnStructureScore(chess)
+
+    return this.getWeightedScore(materialScore, mobilityScore, kingSafetyScore, scoringWeights, pawnStructureScore)
   }
-  private getWeightedScore(materialScore: number, mobilityScore: number, kingSafetyScore: number, weights: typeof scoringWeights): number {
+  private getWeightedScore(materialScore: number, mobilityScore: number, kingSafetyScore: number, weights: typeof scoringWeights, pawnStructureScore: number): number {
     return (
       materialScore * weights.material +
       mobilityScore * weights.mobility +
-      kingSafetyScore * weights.kingSafety
+      kingSafetyScore * weights.kingSafety + 
+      pawnStructureScore * weights.pawnStructure
     )
   }
   private getMaterialScore(chess: Chess, values: Record<PieceSymbol, number> = pieceValues): number {
@@ -147,6 +151,36 @@ export class Algorithm {
     }
 
     return score
+  }
+  private pawnStructureScore(chess: Chess) {
+    let whiteScore = 0
+    let blackScore = 0
+    
+    // Punish doubled pawns, isolated pawns, and backward pawns
+    for (let file = 0; file < 8; file++) { // Iterate through each file (a-h)
+      let whitePawnsInFile = 0
+      let blackPawnsInFile = 0
+        for (let rank = 0; rank < 8; rank++) {
+          const square = (String.fromCharCode('a'.charCodeAt(0) + file) + (rank + 1)) as Square
+
+          const piece = chess.get(square)
+          if (!piece || piece.type !== PAWN) continue // if not piece or piece not a pawn
+
+          if (piece.color === 'w') {
+            whitePawnsInFile++ // Just counting # of pawns in this file for white
+          } else {
+            blackPawnsInFile++
+          }
+
+          if (whitePawnsInFile > 1) { // if more then 1 pawn in that file, it's a doubled pawn
+            whiteScore -= 1 // Doubled pawn penalty
+          }
+          if (blackPawnsInFile > 1) {
+            blackScore -= 1 // Doubled pawn penalty
+          }
+        }
+       }
+       return whiteScore - blackScore // Return score 
   }
   private orderMoves(chess: Chess, moves: Move[]): Move[] {
     return moves.sort((a, b) => this.scoreMoves(b) - this.scoreMoves(a))
