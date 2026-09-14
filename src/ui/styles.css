@@ -7,7 +7,7 @@
   --accent: #c4a35a;
   --accent-hover: #d4b56a;
   --border: #3a4540;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: "Segoe UI", system-ui, sans-serif;
   line-height: 1.45;
   background: radial-gradient(ellipse at top, #2a332e 0%, var(--bg) 55%);
   color: var(--text);
