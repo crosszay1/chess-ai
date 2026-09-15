@@ -28,7 +28,7 @@ const scoringWeights = {
   kingSafety: 1, // Set this lower because otherwise the algorithm cares too much, and doesn't develop it's pieces
   pawnStructure: 1,
 };
-interface WeightedScores {
+export interface WeightedScores {
   material: number;
   mobility: number;
   kingSafety: number;
@@ -71,6 +71,18 @@ export class Algorithm {
     chess: Chess,
     values: Record<PieceSymbol, number> = pieceValues,
   ): number {
+    const scores = this.getWeightedScores(chess, values);
+    return (
+      scores.material +
+      scores.mobility +
+      scores.kingSafety +
+      scores.pawnStructure
+    );
+  }
+  public getWeightedScores(
+    chess: Chess,
+    values: Record<PieceSymbol, number> = pieceValues,
+  ): WeightedScores {
     const materialScore = this.getMaterialScore(chess, values);
     const mobilityScore = this.mobilityScore(chess);
 
@@ -88,43 +100,13 @@ export class Algorithm {
     );
 
     const kingSafetyScore = whiteKingSafetyScore - blackKingSafetyScore;
-
     const pawnStructureScore = this.pawnStructureScore(chess);
 
-    return this.calculateWeightedScore(
-      materialScore,
-      mobilityScore,
-      kingSafetyScore,
-      scoringWeights,
-      pawnStructureScore,
-    );
-  }
-  private calculateWeightedScore(
-    materialScore: number,
-    mobilityScore: number,
-    kingSafetyScore: number,
-    weights: typeof scoringWeights,
-    pawnStructureScore: number,
-  ): number {
-    return (
-      materialScore * weights.material +
-      mobilityScore * weights.mobility +
-      kingSafetyScore * weights.kingSafety +
-      pawnStructureScore * weights.pawnStructure
-    );
-  }
-  public getWeightedScores(
-    materialScore: number,
-    mobilityScore: number,
-    kingSafetyScore: number,
-    weights: typeof scoringWeights,
-    pawnStructureScore: number,
-  ): WeightedScores {
     return {
-      material: materialScore * weights.material,
-      mobility: mobilityScore * weights.mobility,
-      kingSafety: kingSafetyScore * weights.kingSafety,
-      pawnStructure: pawnStructureScore * weights.pawnStructure,
+      material: materialScore * scoringWeights.material,
+      mobility: mobilityScore * scoringWeights.mobility,
+      kingSafety: kingSafetyScore * scoringWeights.kingSafety,
+      pawnStructure: pawnStructureScore * scoringWeights.pawnStructure,
     };
   }
   private getMaterialScore(

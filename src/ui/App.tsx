@@ -22,6 +22,16 @@ function gameStatus(chess: Chess): string {
   return `${chess.turn() === "w" ? "White" : "Black"} to move`;
 }
 
+function formatScore(n: number): string {
+  return Number.isInteger(n) ? String(n) : n.toFixed(1);
+}
+
+function formatComponent(n: number): string {
+  if (n > 0) return `+${formatScore(n)}`;
+  if (n < 0) return formatScore(n);
+  return "0";
+}
+
 export default function App() {
   const algorithmRef = useRef(new Algorithm());
   const gameRef = useRef(new Chess());
@@ -57,12 +67,20 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [playing, fen]);
 
-  const score = algorithmRef.current.evaluateBoard(game, pieceValues);
+  const weightedScores = algorithmRef.current.getWeightedScores(
+    game,
+    pieceValues,
+  );
+  const score =
+    weightedScores.material +
+    weightedScores.mobility +
+    weightedScores.kingSafety +
+    weightedScores.pawnStructure;
   const scoreLabel =
     score > 0
-      ? `White +${score}`
+      ? `White +${formatScore(score)}`
       : score < 0
-        ? `Black +${Math.abs(score)}`
+        ? `Black +${formatScore(Math.abs(score))}`
         : "Even";
 
   function reset() {
@@ -136,6 +154,32 @@ export default function App() {
           <div className="stat">
             <span className="label">Score</span>
             <span className="value">{scoreLabel}</span>
+          </div>
+          <div className="score-breakdown">
+            <div className="stat">
+              <span className="label">Material</span>
+              <span className="value">
+                {formatComponent(weightedScores.material)}
+              </span>
+            </div>
+            <div className="stat">
+              <span className="label">Mobility</span>
+              <span className="value">
+                {formatComponent(weightedScores.mobility)}
+              </span>
+            </div>
+            <div className="stat">
+              <span className="label">King safety</span>
+              <span className="value">
+                {formatComponent(weightedScores.kingSafety)}
+              </span>
+            </div>
+            <div className="stat">
+              <span className="label">Pawn structure</span>
+              <span className="value">
+                {formatComponent(weightedScores.pawnStructure)}
+              </span>
+            </div>
           </div>
           <div className="stat">
             <span className="label">Moves</span>
