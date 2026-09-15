@@ -28,6 +28,12 @@ const scoringWeights = {
   kingSafety: 1, // Set this lower because otherwise the algorithm cares too much, and doesn't develop it's pieces
   pawnStructure: 1,
 };
+interface WeightedScores {
+  material: number;
+  mobility: number;
+  kingSafety: number;
+  pawnStructure: number;
+}
 
 export class Algorithm {
   public decideMove(chess: Chess, depth = 3) {
@@ -85,7 +91,7 @@ export class Algorithm {
 
     const pawnStructureScore = this.pawnStructureScore(chess);
 
-    return this.getWeightedScore(
+    return this.calculateWeightedScore(
       materialScore,
       mobilityScore,
       kingSafetyScore,
@@ -93,7 +99,7 @@ export class Algorithm {
       pawnStructureScore,
     );
   }
-  private getWeightedScore(
+  private calculateWeightedScore(
     materialScore: number,
     mobilityScore: number,
     kingSafetyScore: number,
@@ -106,6 +112,20 @@ export class Algorithm {
       kingSafetyScore * weights.kingSafety +
       pawnStructureScore * weights.pawnStructure
     );
+  }
+  public getWeightedScores(
+    materialScore: number,
+    mobilityScore: number,
+    kingSafetyScore: number,
+    weights: typeof scoringWeights,
+    pawnStructureScore: number,
+  ): WeightedScores {
+    return {
+      material: materialScore * weights.material,
+      mobility: mobilityScore * weights.mobility,
+      kingSafety: kingSafetyScore * weights.kingSafety,
+      pawnStructure: pawnStructureScore * weights.pawnStructure,
+    };
   }
   private getMaterialScore(
     chess: Chess,
