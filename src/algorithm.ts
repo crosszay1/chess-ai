@@ -24,7 +24,7 @@ export const pieceValues: Record<PieceSymbol, number> = {
 
 const scoringWeights = {
   material: 1,
-  mobility: 0.5,
+  mobility: 0.1,
   kingSafety: 1, // Set this lower because otherwise the algorithm cares too much, and doesn't develop it's pieces
   pawnStructure: 1,
 };
